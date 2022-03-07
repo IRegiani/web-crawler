@@ -34,21 +34,61 @@ module.exports = ({ options } = {}) => {
                 if (webhook && !webhook.url) throw new CustomError('Missing url on webhook', StatusCodes.BAD_REQUEST);
                 if (webhook && !webhook.body) throw new CustomError('Missing body on webhook', StatusCodes.BAD_REQUEST);
                 if (typeof ignoreQueryParams !== 'boolean') throw new CustomError('ignoreQueryParams should be a boolean', StatusCodes.BAD_REQUEST);
-                // TODO: Implement webhook
 
+                // TODO: Implement webhook
                 // TODO: Implement a denylist of urls
+                // TODO: Implement waitInterval
                 // TODO: Continue on URL fetch/parse failure/timeout, save on DB
 
                 const html = await htmlParser.fetchHtml(urlFixed);
                 const anchors = await htmlParser.parseHtml(html, `${protocol}//${hostname}`, ignoreQueryParams);
 
-                logger.success('First level completed successfully');
+                logger.success('First level crawler completed successfully');
 
                 const entry = await dbService.createCrawlerEntry(urlFixed, anchors, webhook, maxDepth);
-                // This should be a Worker?
+                // WIP: This should be a Worker?
                 deepCrawler.start(entry.id);
 
-                return response.status(StatusCodes.CREATED).json({ firstLevelAnchors: anchors, id: entry.id });
+                return response.status(StatusCodes.CREATED).json({ id: entry.id, firstLevelUrls: anchors });
+            } catch (error) {
+                if (isExpectedError(error)) return handleError(response, error, logger);
+
+                return next(error);
+            }
+        },
+
+        async getOne(request, response, next) {
+            const { params: { id } } = request;
+
+            try {
+                logger.info(`Getting result ${id}`);
+                let crawlerData;
+
+                try {
+                    crawlerData = await dbService.getOne(id);
+                } catch (error) {
+                    throw new CustomError(`There is no crawler with id ${id}`, StatusCodes.NOT_FOUND);
+                }
+
+                logger.success(`Result ${crawlerData.id} loaded successfully`);
+
+                return response.status(StatusCodes.OK).json(crawlerData);
+            } catch (error) {
+                if (isExpectedError(error)) return handleError(response, error, logger);
+
+                return next(error);
+            }
+        },
+
+        async getList(request, response, next) {
+            try {
+                logger.info('Getting results');
+
+                const crawlerDataList = await dbService.getList();
+
+                logger.success('Result list retrieved');
+
+                return response.status(StatusCodes.OK).json(crawlerDataList);
             } catch (error) {
                 if (isExpectedError(error)) return handleError(response, error, logger);
 

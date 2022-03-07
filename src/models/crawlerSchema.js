@@ -1,15 +1,24 @@
-const mongoose = require('mongoose');
-// const { nanoid } = require('nanoid');
+const { Schema } = require('mongoose');
 
-const crawlerSchema = new mongoose.Schema({
+const crawlerSchema = new Schema({
     initialUrl: { type: String, required: true },
-    urls: [[String]],
     webhook: { message: String, url: String },
     maxDepth: Number,
-    // id: { type: String, default: nanoid },
-});
+    duration: Number,
+    status: { type: String, default: 'pending' },
+    urls: [[String]],
+}, { timestamps: true });
 
-// WIP:
-// crawlerSchema.set('toObject', { getters: true, transform: (obj) => obj });
+crawlerSchema.set('toJSON', {
+    getters: true,
+    versionKey: false,
+    transform: (_, obj) => (
+        {
+            ...obj,
+            _id: undefined,
+            duration: obj.duration ? obj.duration : (new Date() - new Date(obj.createdAt)) / 1000,
+        }
+    ),
+});
 
 module.exports = () => crawlerSchema;

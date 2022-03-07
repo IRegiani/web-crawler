@@ -10,7 +10,6 @@ const RequestInterceptor = require('../interceptors/request');
 
 // Router
 const crawlerRouter = require('../routers/crawlerRouter');
-const resultsRouter = require('../routers/resultsRouter');
 
 class Service {
     constructor(logger) {
@@ -32,7 +31,6 @@ class Service {
 
         // Routers
         this._app.use(apiVersion, crawlerRouter());
-        this._app.use(apiVersion, resultsRouter());
 
         // TODO
         // const swaggerContent = require('../swagger')();
