@@ -1,4 +1,5 @@
 const config = require('config');
+const requestContext = require('express-http-context');
 const { Signale } = require('signale');
 
 const levels = ['info', 'error', 'success', 'warn', 'debug', 'complete'];
@@ -10,6 +11,7 @@ const formatter = new Signale(options);
 formatter.config({ displayTimestamp: true, uppercaseLabel: true });
 
 const createLogPrefixAndSuffix = (metadata, shouldShowMetadata, extraSuffix) => {
+    const reqId = requestContext.get('reqId');
     const getSuffixFormat = (suffix = '') => {
         if (!shouldShowMetadata) return suffix;
         if (errorHasStack(metadata)) return `\n${metadata.stack}${suffix}`;
@@ -20,7 +22,7 @@ const createLogPrefixAndSuffix = (metadata, shouldShowMetadata, extraSuffix) => 
         return suffix;
     };
 
-    return { prefix: { reqId: '' }, suffix: getSuffixFormat(extraSuffix) };
+    return { prefix: { reqId }, suffix: getSuffixFormat(extraSuffix) };
 };
 
 const handleLog = (level, shouldShowMetadata, name) => (message, metadata, extraSuffix) => {

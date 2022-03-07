@@ -1,0 +1,9 @@
+{
+    "db": {
+        "auth": {
+            "username": "DB_USERNAME",
+            "password": "DB_PASSWORD"
+        },
+        "address": "DB_ADDRESS"
+    }
+}

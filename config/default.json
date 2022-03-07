@@ -12,5 +12,9 @@
         "port": 4040,
         "version": "/v1",
         "ssl": false
+    },
+    "db": {
+        "port": 27017,
+        "name": "crawler"
     }
 }

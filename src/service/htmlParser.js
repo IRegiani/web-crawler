@@ -8,7 +8,7 @@ const logger = require('../utils/logger').initLogger({ name: 'HTML PARSER SERVIC
 
 const fetchHtml = async (url) => {
     logger.info(`Fetching ${url}`);
-    const response = await axios(url).catch((err) => { throw new CustomError(`Error fetching ${url}: ${err.message}`); });
+    const response = await axios(url).catch((err) => { throw new CustomError(`Error fetching ${url} ${err.message}`); });
 
     if (response.status !== 200) {
         throw new CustomError(`Response ${response.status} fetching ${url}`);

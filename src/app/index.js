@@ -4,6 +4,9 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const { StatusCodes } = require('http-status-codes');
+const mongoose = require('mongoose');
+
+const RequestInterceptor = require('../interceptors/request');
 
 // Router
 const crawlerRouter = require('../routers/crawlerRouter');
@@ -24,17 +27,14 @@ class Service {
         this._app.use(cors(config.get('cors')));
         this._app.set('trust proxy', true);
 
-        // add db instance in the response
-        // const databaseInstance = await this.startDB();
-        // this._app.use((request, response, next) => { response.locals.db = databaseInstance; next(); });
-
         const apiVersion = config.get('server.version');
+        this._app.use(RequestInterceptor());
 
         // Routers
-        // this._app.use(AuthorizationRouter());
         this._app.use(apiVersion, crawlerRouter());
         this._app.use(apiVersion, resultsRouter());
 
+        // TODO
         // const swaggerContent = require('../swagger')();
         // this._app.use(`${apiVersion}/doc`, swagger.serve, swagger.setup(swaggerContent, { explorer: true }));
 
@@ -46,6 +46,7 @@ class Service {
 
         this._app.use((req, res) => res.status(StatusCodes.NOT_FOUND).json({ message: 'Route not found' }));
         this._app.use(errorHandler);
+        await this.startDB();
     }
 
     async listen(...params) {
@@ -53,16 +54,16 @@ class Service {
     }
 
     async startDB() {
-        // const engine = new StormDB.localFileEngine('./journal-db', { async: true });
-        // this._db = new StormDB(engine);
-
-        // require('../services/fileService')().checkPath();
-
-        // // set default db value if db is empty
-        // this._db.default({ users: {}, journals: [], files: {}, tags: { entry: [], journal: [] } });
-
-        this.logger.info('Database ready');
-        return this._db;
+        try {
+            await mongoose.connect(
+                `mongodb://${config.get('db.address')}:${config.get('db.port')}`,
+                { autoIndex: false, dbName: config.get('db.name'), auth: config.get('db.auth') },
+            );
+            this.logger.info('Database ready');
+        } catch (error) {
+            this.logger.error('Error connecting to DB');
+            throw error;
+        }
     }
 }
 
