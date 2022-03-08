@@ -19,6 +19,10 @@ module.exports = (options) => {
             // WIP: Should check if any URL on the list has already been visited
             // eslint-disable-next-line no-await-in-loop
             const newUrls = await craw(urlList[currentDepth - 2], ignoreQueryParams);
+            if (newUrls.length === 0) {
+                logger.info(`No more URLs were found. Exiting at depth ${currentDepth}`);
+                break;
+            }
             // WIP: Flat should work for now
             urlList.push(newUrls.flat());
         }
