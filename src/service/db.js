@@ -15,7 +15,15 @@ module.exports = (options) => {
 
     const getOne = async (_id) => Crawler.findById(_id).exec();
 
-    // const addMoreUrlsToCrawler = () => {}
+    const addMoreUrlsToCrawler = async (id, urls) => {
+        logger.info(`Updating URLs on ${id}`);
+        await Crawler.findByIdAndUpdate(id, { $push: { urls } });
+    };
+
+    const markAsCompleted = async (id, createdAt) => {
+        logger.info(`Marking ${id} as complete`);
+        await Crawler.findByIdAndUpdate(id, { status: 'completed', duration: (new Date() - new Date(createdAt)) / 1000 });
+    };
 
     // const checkIfAnyUrlHasBeenVisited = () => {}
 
@@ -23,5 +31,7 @@ module.exports = (options) => {
         createCrawlerEntry,
         getList,
         getOne,
+        addMoreUrlsToCrawler,
+        markAsCompleted,
     };
 };

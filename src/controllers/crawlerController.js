@@ -47,7 +47,7 @@ module.exports = (options) => {
 
                 const entry = await dbService.createCrawlerEntry(urlFixed, anchors, webhook, maxDepth);
                 // WIP: This should be a Worker?
-                deepCrawler.start(entry.id);
+                deepCrawler.start(entry.id, ignoreQueryParams);
 
                 return response.status(StatusCodes.CREATED).json({ id: entry.id, firstLevelUrls: anchors });
             } catch (error) {
