@@ -1,9 +1,14 @@
+/* istanbul ignore file */
+
 const config = require('config');
 const requestContext = require('express-http-context');
 const { Signale } = require('signale');
 
 const levels = ['info', 'error', 'success', 'warn', 'debug', 'complete'];
-const options = { types: { debug: { color: 'magenta', label: 'debug', logLevel: 'debug' } } };
+const options = {
+    types: { debug: { color: 'magenta', label: 'debug', logLevel: 'debug' } },
+    disabled: config.has('logger.disabled') && config.get('logger.disabled'),
+};
 
 const errorHasStack = (error) => error instanceof Error && error.stack;
 

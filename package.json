@@ -7,7 +7,8 @@
     "scripts": {
         "test": "npm run test:unit",
         "pretest:unit": "npm run lint",
-        "test:unit": "echo Pending UT implementation",
+        "test:unit": "jest --config jest.config.js --coverage",
+        "test:unit:no-cov": "jest --config jest.config.js",
         "lint": "eslint --config .eslintrc.js --ext .js ./src",
         "start": "node index.js",
         "local": "nodemon index.js",
@@ -46,6 +47,7 @@
         "eslint-plugin-import": "^2.25.4",
         "eslint-plugin-promise": "^6.0.0",
         "jest": "^27.5.1",
+        "jest-html-reporter": "^3.4.2",
         "nodemon": "^2.0.15"
     }
 }

@@ -5,7 +5,7 @@ const { StatusCodes } = require('http-status-codes');
 const logger = require('../utils/logger').initLogger({ name: 'CRAWLER CONTROLLER' });
 const { handleError, isExpectedError, CustomError } = require('../utils/error')();
 
-module.exports = ({ options } = {}) => {
+module.exports = (options) => {
     const htmlParser = options?.htmlParser || require('../service/htmlParser')();
     const dbService = options?.dbService || require('../service/db')();
     const deepCrawler = options?.deepCrawler || require('../service/deepCrawler')();
@@ -14,7 +14,7 @@ module.exports = ({ options } = {}) => {
 
     const CrawlerController = {
 
-        async crawler(request, response, next) {
+        async createCrawler(request, response, next) {
             const { body: { url, webhook, ignoreQueryParams = false, maxDepth } } = request;
 
             try {
@@ -66,6 +66,7 @@ module.exports = ({ options } = {}) => {
 
                 try {
                     crawlerData = await dbService.getOne(id);
+                    // WIP: This error should be specific
                 } catch (error) {
                     throw new CustomError(`There is no crawler with id ${id}`, StatusCodes.NOT_FOUND);
                 }

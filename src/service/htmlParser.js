@@ -22,7 +22,7 @@ const parseHtml = (html, url, ignoreQueryParams) => new Promise((resolve, reject
 
         const anchors = DomUtils.getElementsByTagName('a', dom);
         logger.debug(`Found ${anchors.length} anchor elements`);
-        // Some anchor are just the url path without the base url
+        // Some anchor are relative links, so we turn them into absolute links
         const anchorMapper = ({ attribs: { href } }) => {
             const anchor = href.startsWith('/') ? url + href : href;
             return anchor.endsWith('/') ? anchor.substring(0, anchor.length - 1) : anchor;

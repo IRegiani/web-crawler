@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 const config = require('config');
 const compression = require('compression');
 const express = require('express');

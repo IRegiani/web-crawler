@@ -1,0 +1,7 @@
+{
+    "logger": {
+        "verbose": false,
+        "debug": false,
+        "disabled": true
+    }
+}

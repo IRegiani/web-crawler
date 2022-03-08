@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 const config = require('config');
 
 const logger = require('./src/utils/logger').initLogger({ name: 'MAIN' });
