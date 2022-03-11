@@ -1,0 +1,6 @@
+{
+    "logger": {
+        "verbose": false,
+        "debug": false
+    }
+}

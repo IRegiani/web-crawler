@@ -1,7 +1,9 @@
-# WebCrawler
+# Web-Crawler
 
 Fetches all URLs from a address
 ## Routes
+
+#### v1
 
 POST /crawler Initiate the crawler on a URL, returning the all URLs found at first level. Further levels are fetched asynchronously 
 
@@ -90,7 +92,11 @@ GET /results/:id get one result
 
 ### Running locally
 
-Create a file `local.js` inside config or use the environment variables defined in `custom-environment-variables.json`
+Start the Mongo Database and then create a file `local.js` inside config or use the environment variables defined in `custom-environment-variables.json`. Run the service with `npm run local`
+
+A docker-compose file is provided: `docker-compose -f docker-compose.yaml up`. All environment variables are placeholders and **must be updated**
+
+Alternatively, the Mongo DB can be run with only `docker run -d --name crawler-db -e MONGO_INITDB_ROOT_USERNAME=[user] -e MONGO_INITDB_ROOT_PASSWORD=[secret] mongo`
 
 #### Unit Tests
 
