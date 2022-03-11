@@ -3,20 +3,22 @@ const { Parser } = require('htmlparser2');
 const { DomHandler } = require('domhandler');
 const DomUtils = require('domutils');
 
-const { CustomError } = require('../utils/error')();
+// const { CustomError } = require('../utils/error')();
 const logger = require('../utils/logger').initLogger({ name: 'HTML PARSER SERVICE' });
 
 const fetchHtml = async (url) => {
     logger.info(`Fetching ${url}`);
-    const response = await axios(url).catch((err) => { throw new CustomError(`Error fetching ${url} ${err.message}`); });
-
-    if (response.status !== 200) {
-        throw new CustomError(`Response ${response.status} fetching ${url}`);
+    try {
+        const response = await axios(url);
+        return response.status === 200 ? response.data : null;
+    } catch (error) {
+        logger.error(`Error fetching ${url}`, error);
+        return null;
     }
-    return response.data;
 };
 
 const parseHtml = (html, url, ignoreQueryParams) => new Promise((resolve, reject) => {
+    if (!url) resolve([]);
     const domHandler = new DomHandler((error, dom) => {
         if (error) reject(error);
 
@@ -25,7 +27,7 @@ const parseHtml = (html, url, ignoreQueryParams) => new Promise((resolve, reject
         // Some anchor are relative links, so we turn them into absolute links
         const anchorMapper = ({ attribs: { href } }) => {
             if (!href) return null;
-            const anchor = href.startsWith('/') ? url + href : href;
+            const anchor = href.startsWith('/') || href.startsWith('.') ? url + href : href;
             return anchor.endsWith('/') ? anchor.substring(0, anchor.length - 1) : anchor;
         };
 

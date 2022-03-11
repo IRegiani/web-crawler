@@ -96,7 +96,7 @@ Start the Mongo Database and then create a file `local.js` inside config or use 
 
 A docker-compose file is provided: `docker-compose -f docker-compose.yaml up`. All environment variables are placeholders and **must be updated**
 
-Alternatively, the Mongo DB can be run with only `docker run -d --name crawler-db -e MONGO_INITDB_ROOT_USERNAME=[user] -e MONGO_INITDB_ROOT_PASSWORD=[secret] mongo`
+Alternatively, the Mongo DB can be run with only `docker run -d --name crawler-db -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=[user] -e MONGO_INITDB_ROOT_PASSWORD=[secret] mongo`
 
 #### Unit Tests
 

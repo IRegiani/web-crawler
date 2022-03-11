@@ -12,30 +12,34 @@ module.exports = (options) => {
         const { maxDepth, urls, webhook, createdAt } = await dbService.getOne(crawlerId);
 
         let currentDepth = 1;
-        const urlList = urls;
+        let currentKey = 0;
         while (currentDepth < maxDepth) {
-            currentDepth += 1;
-            logger.info(`Starting crawler at level ${currentDepth}`);
+            logger.info(`\t>>>>>>>>>>>>>>>>>>>> \t Starting crawler at level ${currentDepth + 1}\n`);
+
             // WIP: Should check if any URL on the list has already been visited
+            currentKey = currentDepth;
+            const currentFetchList = urls[currentKey];
             // eslint-disable-next-line no-await-in-loop
-            const newUrls = await craw(urlList[currentDepth - 2], ignoreQueryParams);
+            const newUrls = await craw(currentFetchList, ignoreQueryParams);
             if (newUrls.length === 0) {
                 logger.info(`No more URLs were found. Exiting at depth ${currentDepth}`);
                 break;
             }
-            // WIP: Flat should work for now
-            urlList.push(newUrls.flat());
+            // WIP: Urls should be { 0: [], 0-1: []}
+            // eslint-disable-next-line no-loop-func
+            newUrls.forEach((uList, index) => {
+                urls[`${currentDepth - 1}-${index}`] = uList;
+            });
+            currentDepth += 1;
         }
 
-        // TODO: This should be a single operation
-        await Promise.all([
-            dbService.addMoreUrlsToCrawler(crawlerId, urlList),
-            dbService.markAsCompleted(crawlerId, createdAt),
-        ]);
+        console.log(urls);
+
+        await dbService.markAsCompleted(crawlerId, createdAt, urls);
 
         logger.success('Crawler finished');
 
-        if (webhook) {
+        if (webhook.url) {
             logger.info('Making request to webhook [WIP]');
         }
     };

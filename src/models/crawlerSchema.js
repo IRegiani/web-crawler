@@ -6,7 +6,7 @@ const crawlerSchema = new Schema({
     maxDepth: Number,
     duration: Number,
     status: { type: String, default: 'pending' },
-    urls: [[String]],
+    urls: Object,
 }, { timestamps: true });
 
 crawlerSchema.set('toJSON', {
