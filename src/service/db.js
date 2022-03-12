@@ -6,8 +6,8 @@ const logger = require('../utils/logger').initLogger({ name: 'DB SERVICE' });
 module.exports = (options) => {
     const { Crawler } = options?.Crawler || require('../models')();
 
-    const createCrawlerEntry = async (url, anchors, webhook, maxDepth) => {
-        const crawler = new Crawler({ initialUrl: url, urls: { 0: anchors }, webhook, maxDepth });
+    const createCrawlerEntry = async (url, anchors, maxDepth) => {
+        const crawler = new Crawler({ initialUrl: url, urls: [anchors], maxDepth });
         await crawler.save();
         logger.info('New crawler entry created', crawler.id);
         return crawler;

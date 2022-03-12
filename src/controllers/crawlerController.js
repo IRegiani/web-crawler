@@ -15,17 +15,23 @@ module.exports = (options) => {
     const CrawlerController = {
 
         async createCrawler(request, response, next) {
-            const { body: { url, webhook, ignoreQueryParams = false, maxDepth } } = request;
+            const {
+                body: {
+                    url,
+                    webhook,
+                    maxDepth,
+                    ignoreQueryParams = false,
+                    filterThirdPartyDomains = true,
+                } } = request;
 
             try {
-                logger.info(`Creating crawler for ${url}`);
                 if (!url) throw new CustomError('Missing url', StatusCodes.BAD_REQUEST);
 
                 const urlFixed = url.includes('http') ? url : `https://${url}`;
-                let hostname;
-                let protocol;
+                logger.info(`Creating crawler for ${urlFixed}`);
+
                 try {
-                    ({ hostname, protocol } = new URL(urlFixed));
+                    const { hostname } = new URL(urlFixed);
                     await resolver.resolve4(hostname);
                 } catch (error) {
                     throw new CustomError('Invalid url', StatusCodes.BAD_REQUEST);
@@ -34,6 +40,7 @@ module.exports = (options) => {
                 if (webhook && !webhook.url) throw new CustomError('Missing url on webhook', StatusCodes.BAD_REQUEST);
                 if (webhook && !webhook.body) throw new CustomError('Missing body on webhook', StatusCodes.BAD_REQUEST);
                 if (typeof ignoreQueryParams !== 'boolean') throw new CustomError('ignoreQueryParams should be a boolean', StatusCodes.BAD_REQUEST);
+                if (typeof filterThirdPartyDomains !== 'boolean') throw new CustomError('filterThirdPartyDomains should be a boolean', StatusCodes.BAD_REQUEST);
 
                 // TODO: Implement webhook
                 // TODO: Implement a denylist of urls
@@ -41,13 +48,13 @@ module.exports = (options) => {
                 // TODO: Continue on URL fetch/parse failure/timeout, save on DB
 
                 const html = await htmlParser.fetchHtml(urlFixed);
-                const anchors = await htmlParser.parseHtml(html, `${protocol}//${hostname}`, ignoreQueryParams);
+                const anchors = await htmlParser.parseHtml(html, urlFixed, ignoreQueryParams, filterThirdPartyDomains);
 
                 logger.success('First level crawler completed successfully');
 
-                const entry = await dbService.createCrawlerEntry(urlFixed, anchors, webhook, maxDepth);
+                const entry = await dbService.createCrawlerEntry(urlFixed, anchors, maxDepth);
                 // WIP: This should be a Worker?
-                deepCrawler.start(entry.id, ignoreQueryParams);
+                deepCrawler.start(entry.id, webhook, ignoreQueryParams);
 
                 return response.status(StatusCodes.CREATED).json({ id: entry.id, firstLevelUrls: anchors });
             } catch (error) {

@@ -2,11 +2,10 @@ const { Schema } = require('mongoose');
 
 const crawlerSchema = new Schema({
     initialUrl: { type: String, required: true },
-    webhook: { message: String, url: String },
     maxDepth: Number,
     duration: Number,
     status: { type: String, default: 'pending' },
-    urls: Object,
+    urls: [[String]],
 }, { timestamps: true });
 
 crawlerSchema.set('toJSON', {

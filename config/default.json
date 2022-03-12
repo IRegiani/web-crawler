@@ -5,13 +5,17 @@
     },
     "logger": {
         "verbose": true,
-        "debug": true,
+        "debug": false,
         "writeToFile": false
     },
     "server": {
         "port": 4040,
         "version": "/v1",
         "ssl": false
+    },
+    "cluster": {
+        "enabled": true,
+        "maxCpus": 2
     },
     "db": {
         "port": 27017,

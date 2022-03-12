@@ -1,4 +1,4 @@
-# Web-Crawler
+ Web-Crawler
 
 Fetches all URLs from a address
 ## Routes
@@ -7,11 +7,14 @@ Fetches all URLs from a address
 
 POST /crawler Initiate the crawler on a URL, returning the all URLs found at first level. Further levels are fetched asynchronously 
 
+Note: `filterThirdPartyDomains` filter subdomains as well
+
 Body Example (only url is required): 
 ```
 {
     url: "google.com",
     "ignoreQueryParams": true,
+    "filterThirdPartyDomains": true,
     "maxDepth": 10
     "webhook": {
         "url": "",
@@ -105,10 +108,9 @@ Unit Tests can be run with `npm run test:unit`, reports will be available at `re
 ### Pending Points
 
 - Add swagger
-- Implement webhook
-- Implement clustering
+- Improve webhook body
 - Add a denylist or domain restriction
 - Check if an URL has already been visited
 - Implement a wait interval or a queue (p-queue) between requests and separate them in batches
-- Handle errors when fetching. Save those in the DB to try again later and update crawler status to failed
 - Increase code coverage to 80%
+- Add option to custom headers

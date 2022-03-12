@@ -4,6 +4,7 @@ const config = require('config');
 const compression = require('compression');
 const express = require('express');
 const helmet = require('helmet');
+const requestContext = require('express-http-context');
 const cors = require('cors');
 const { StatusCodes } = require('http-status-codes');
 const mongoose = require('mongoose');
@@ -26,6 +27,7 @@ class Service {
         this._app.use(express.urlencoded({ extended: true }));
         this._app.use(express.json());
         this._app.use(cors(config.get('cors')));
+        this._app.use(requestContext.middleware);
         this._app.set('trust proxy', true);
 
         const apiVersion = config.get('server.version');

@@ -32,7 +32,7 @@ const createLogPrefixAndSuffix = (metadata, shouldShowMetadata, extraSuffix) => 
 
 const handleLog = (level, shouldShowMetadata, name) => (message, metadata, extraSuffix) => {
     const { prefix: { reqId }, suffix } = createLogPrefixAndSuffix(metadata, shouldShowMetadata, extraSuffix);
-    const prefixToLog = `[${reqId ? ` reqId: ${reqId} ` : ''}]`;
+    const prefixToLog = `[${process.pid}${reqId ? ` ${reqId}` : ''}]`;
 
     formatter.scope(name)[level]({ message, prefix: prefixToLog, suffix });
 };
