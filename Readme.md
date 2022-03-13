@@ -32,3 +32,8 @@ Unit Tests can be run with `npm run test:unit`, reports will be available at `re
 - Increase code coverage to 80%
 - Add option to custom headers
 - Add filters when fetching crawler lists
+- Refactor to TypeScript and ES
+
+## Note
+
+Using a big maxDepth will consume lots of memory (>2GB). This will crash node js, run it as `npm run serve-big-memory`

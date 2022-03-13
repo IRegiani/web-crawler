@@ -19,7 +19,7 @@ module.exports = (options) => {
                 body: {
                     url,
                     webhook,
-                    maxDepth = 50,
+                    maxDepth = 10,
                     ignoreQueryParams = true,
                     filterThirdPartyDomains = true,
                 } } = request;
@@ -69,7 +69,7 @@ module.exports = (options) => {
             const { params: { id } } = request;
 
             try {
-                logger.info(`Getting result ${id}`);
+                logger.info(`Getting crawler ${id}`);
                 let crawlerData;
 
                 try {
@@ -81,7 +81,7 @@ module.exports = (options) => {
 
                 if (!crawlerData) throw new CustomError(`There is no crawler with id ${id}`, StatusCodes.NOT_FOUND);
 
-                logger.success(`Result ${crawlerData.id} loaded successfully`);
+                logger.success(`Crawler ${crawlerData.id} loaded successfully`);
 
                 return response.status(StatusCodes.OK).json(crawlerData);
             } catch (error) {

@@ -1,5 +1,6 @@
 services:
   service:
+    cpuset: 0,1
     build: .
     ports:
       - "4040:4040"

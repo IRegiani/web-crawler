@@ -4,7 +4,7 @@ const pLimit = require('p-limit');
 const logger = require('../utils/logger').initLogger({ name: 'CRAWLER SERVICE' });
 
 // TODO: Update this package
-const limit = pLimit(500);
+const limit = pLimit(200);
 
 module.exports = (options) => {
     const dbService = options?.dbService || require('./db')();

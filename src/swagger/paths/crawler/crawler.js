@@ -36,8 +36,8 @@ module.exports = () => ({
                             },
                             maxDepth: {
                                 type: 'number',
-                                example: 10,
-                                default: 50,
+                                example: 15,
+                                default: 10,
                                 description: 'Indicates how deep the crawler will go',
                             },
                             ignoreQueryParams: {

@@ -40,7 +40,7 @@ const fetchHtml = async (url, ignoreError = true) => {
         return response.status === 200 ? response.data : null;
     } catch (error) {
         if (ignoreError) {
-            logger.debug(`Error fetching ${url}: ${error.response.data}`, error);
+            logger.debug(`Error fetching ${url}: ${error?.response?.data}`, error);
             return null;
         }
         throw error;
