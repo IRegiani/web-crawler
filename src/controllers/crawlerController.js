@@ -42,19 +42,18 @@ module.exports = (options) => {
                 if (typeof ignoreQueryParams !== 'boolean') throw new CustomError('ignoreQueryParams should be a boolean', StatusCodes.BAD_REQUEST);
                 if (typeof filterThirdPartyDomains !== 'boolean') throw new CustomError('filterThirdPartyDomains should be a boolean', StatusCodes.BAD_REQUEST);
 
-                // TODO: Implement webhook
                 // TODO: Implement a denylist of urls
                 // TODO: Implement waitInterval
                 // TODO: Continue on URL fetch/parse failure/timeout, save on DB
 
                 const html = await htmlParser.fetchHtml(urlFixed);
-                const anchors = await htmlParser.parseHtml(html, urlFixed, ignoreQueryParams, filterThirdPartyDomains);
+                const parserOptions = { ignoreQueryParams, filterThirdPartyDomains };
+                const anchors = await htmlParser.parseHtml(html, urlFixed, parserOptions);
 
                 logger.success('First level crawler completed successfully');
 
                 const entry = await dbService.createCrawlerEntry(urlFixed, anchors, maxDepth);
-                // WIP: This should be a Worker?
-                deepCrawler.start(entry.id, webhook, ignoreQueryParams);
+                deepCrawler.start(entry.id, webhook, { ignoreQueryParams, filterThirdPartyDomains });
 
                 return response.status(StatusCodes.CREATED).json({ id: entry.id, firstLevelUrls: anchors });
             } catch (error) {

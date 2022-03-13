@@ -31,7 +31,7 @@ const initService = async () => {
 
 const clusterEnabled = config.get('cluster.enabled');
 
-// Creates a worker processes
+// Creates a worker processes, cluster will use round robin in workers
 if (clusterEnabled) {
     if (cluster.isPrimary) {
         const availableCpus = os.cpus().length;
@@ -45,10 +45,10 @@ if (clusterEnabled) {
         }
 
         cluster.on('exit', (worker) => {
-            logger.warn(`Worker ${worker.process.pid} died`);
+            logger.error(`Worker ${worker.process.pid} died`);
         });
     } else {
-        logger.debug(`Worker ${process.pid}: Spawning new Service instance...`);
+        logger.debug(`Worker ${process.pid}: Spawning new Service instance`);
         initService();
     }
 } else {

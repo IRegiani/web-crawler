@@ -16,6 +16,7 @@ crawlerSchema.set('toJSON', {
             ...obj,
             _id: undefined,
             duration: obj.duration ? obj.duration : (new Date() - new Date(obj.createdAt)) / 1000,
+            size: obj.urls.reduce((acc, item) => acc + item.length, 0),
         }
     ),
 });

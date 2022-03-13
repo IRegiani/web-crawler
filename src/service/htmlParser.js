@@ -3,20 +3,34 @@ const { Parser } = require('htmlparser2');
 const { DomHandler } = require('domhandler');
 const DomUtils = require('domutils');
 
-// const { CustomError } = require('../utils/error')();
 const logger = require('../utils/logger').initLogger({ name: 'HTML PARSER SERVICE' });
+
+// TODO: There is more invalid url markers
+const invalidAnchors = [
+    'mailto',
+    'whatsapp://',
+    'tel',
+];
 
 // Check why this is needed
 const _removeTailSlash = (url) => (url.endsWith('/') ? url.substring(0, url.length - 1).trim() : url.trim());
 
+// Some anchor are relative links (/, ./, ../../), so we turn them into absolute links
 const normalizeUrlToAbsolute = (baseUrl, url) => {
-    const urlToCheck = (() => {
-        const isRelativeUrl = url.startsWith('/') || url.startsWith('.') || url.startsWith('.') || url.startsWith('..') || !url.startsWith('http');
-        if (!isRelativeUrl) return _removeTailSlash(url);
-        return new URL(url, _removeTailSlash(baseUrl)).href;
-    })();
-    const urlWithoutFragment = new URL(urlToCheck).hash ? urlToCheck.replace(new URL(urlToCheck).hash, '') : urlToCheck;
-    return urlWithoutFragment;
+    if (invalidAnchors.some((inv) => url.startsWith(inv))) return null;
+
+    try {
+        const urlToCheck = (() => {
+            const isRelativeUrl = url.startsWith('/') || url.startsWith('.') || url.startsWith('.') || url.startsWith('..') || !url.startsWith('http');
+            if (!isRelativeUrl) return _removeTailSlash(url);
+            return new URL(url, _removeTailSlash(baseUrl)).href;
+        })();
+        const urlWithoutFragment = new URL(urlToCheck).hash ? urlToCheck.replace(new URL(urlToCheck).hash, '') : urlToCheck;
+        return urlWithoutFragment;
+    } catch (error) {
+        logger.debug('Invalid url', url);
+        return null;
+    }
 };
 
 const fetchHtml = async (url) => {
@@ -30,19 +44,16 @@ const fetchHtml = async (url) => {
     }
 };
 
-const parseHtml = (html, baseUrl, ignoreQueryParams, filterThirdPartyDomains) => new Promise((resolve, reject) => {
-    if (!baseUrl) resolve([]);
+const parseHtml = (html, baseUrl, options) => new Promise((resolve, reject) => {
+    const { ignoreQueryParams, filterThirdPartyDomains } = options;
     const domHandler = new DomHandler((error, dom) => {
         if (error) reject(error);
 
         const anchors = DomUtils.getElementsByTagName('a', dom);
         logger.debug(`Found ${anchors.length} anchor elements`);
-        // Some anchor are relative links (/, ./, ../../), so we turn them into absolute links
         const anchorMapper = ({ attribs: { href } }) => (!href ? null : normalizeUrlToAbsolute(baseUrl, href));
-        // console.log(Array.from(document.getElementsByTagName('a')).map(a => a.href))
 
-        // TODO: There is more invalid url markers
-        let filteredAnchors = [...new Set(anchors.map(anchorMapper))].filter((a) => !!a && !a.startsWith('#') && a !== '' && !a.includes('mailto'));
+        let filteredAnchors = [...new Set(anchors.map(anchorMapper))].filter((a) => !!a && !a.startsWith('#') && a !== '');
         logger.debug(`Removed ${anchors.length - filteredAnchors.length} repeated or invalid anchors`);
 
         if (ignoreQueryParams) {

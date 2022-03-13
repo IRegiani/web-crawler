@@ -17,6 +17,7 @@ module.exports = (options) => {
 
     const getOne = async (id) => {
         const crawlerList = Crawler.findById(id).exec();
+        // TODO: Type to database error
         if (!crawlerList) throw new CustomError(`Id ${id} not found`, StatusCodes.BAD_REQUEST);
         return crawlerList;
     };
@@ -25,8 +26,6 @@ module.exports = (options) => {
         logger.info(`Marking ${id} as complete`);
         await Crawler.findByIdAndUpdate(id, { status: 'completed', duration: (new Date() - new Date(createdAt)) / 1000, urls });
     };
-
-    // const checkIfAnyUrlHasBeenVisited = () => {}
 
     return {
         createCrawlerEntry,

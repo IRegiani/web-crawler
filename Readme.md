@@ -109,8 +109,6 @@ Unit Tests can be run with `npm run test:unit`, reports will be available at `re
 
 - Add swagger
 - Improve webhook body
-- Add a denylist or domain restriction
-- Check if an URL has already been visited
-- Implement a wait interval or a queue (p-queue) between requests and separate them in batches
+- Add a denylist
 - Increase code coverage to 80%
 - Add option to custom headers
