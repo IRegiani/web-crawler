@@ -13,7 +13,7 @@ const invalidAnchors = [
 ];
 
 // Check why this is needed
-const _removeTailSlash = (url) => (url.endsWith('/') ? url.substring(0, url.length - 1).trim() : url.trim());
+const _removeSlash = (url) => (url.endsWith('/') ? url.substring(0, url.length - 1).trim() : url.trim());
 
 // Some anchor are relative links (/, ./, ../../), so we turn them into absolute links
 const normalizeUrlToAbsolute = (baseUrl, url) => {
@@ -22,8 +22,8 @@ const normalizeUrlToAbsolute = (baseUrl, url) => {
     try {
         const urlToCheck = (() => {
             const isRelativeUrl = url.startsWith('/') || url.startsWith('.') || url.startsWith('.') || url.startsWith('..') || !url.startsWith('http');
-            if (!isRelativeUrl) return _removeTailSlash(url);
-            return new URL(url, _removeTailSlash(baseUrl)).href;
+            if (!isRelativeUrl) return _removeSlash(url);
+            return new URL(url, _removeSlash(baseUrl)).href;
         })();
         const urlWithoutFragment = new URL(urlToCheck).hash ? urlToCheck.replace(new URL(urlToCheck).hash, '') : urlToCheck;
         return urlWithoutFragment;
@@ -33,14 +33,17 @@ const normalizeUrlToAbsolute = (baseUrl, url) => {
     }
 };
 
-const fetchHtml = async (url) => {
+const fetchHtml = async (url, ignoreError = true) => {
     logger.info(`Fetching ${url}`);
     try {
         const response = await axios(url);
         return response.status === 200 ? response.data : null;
     } catch (error) {
-        logger.debug(`Error fetching ${url}`, error);
-        return null;
+        if (ignoreError) {
+            logger.debug(`Error fetching ${url}: ${error.response.data}`, error);
+            return null;
+        }
+        throw error;
     }
 };
 

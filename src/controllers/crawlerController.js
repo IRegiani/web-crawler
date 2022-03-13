@@ -19,8 +19,8 @@ module.exports = (options) => {
                 body: {
                     url,
                     webhook,
-                    maxDepth,
-                    ignoreQueryParams = false,
+                    maxDepth = 50,
+                    ignoreQueryParams = true,
                     filterThirdPartyDomains = true,
                 } } = request;
 
@@ -37,6 +37,7 @@ module.exports = (options) => {
                     throw new CustomError('Invalid url', StatusCodes.BAD_REQUEST);
                 }
 
+                // TODo: Those errors should be type as ClientSideError
                 if (webhook && !webhook.url) throw new CustomError('Missing url on webhook', StatusCodes.BAD_REQUEST);
                 if (webhook && !webhook.body) throw new CustomError('Missing body on webhook', StatusCodes.BAD_REQUEST);
                 if (typeof ignoreQueryParams !== 'boolean') throw new CustomError('ignoreQueryParams should be a boolean', StatusCodes.BAD_REQUEST);
@@ -46,7 +47,8 @@ module.exports = (options) => {
                 // TODO: Implement waitInterval
                 // TODO: Continue on URL fetch/parse failure/timeout, save on DB
 
-                const html = await htmlParser.fetchHtml(urlFixed);
+                const html = await htmlParser.fetchHtml(urlFixed, false)
+                    .catch((err) => { throw new CustomError(`Failed to fetch ${urlFixed}. ${err}`); });
                 const parserOptions = { ignoreQueryParams, filterThirdPartyDomains };
                 const anchors = await htmlParser.parseHtml(html, urlFixed, parserOptions);
 
@@ -72,10 +74,12 @@ module.exports = (options) => {
 
                 try {
                     crawlerData = await dbService.getOne(id);
-                    // WIP: This error should be specific
                 } catch (error) {
-                    throw new CustomError(`There is no crawler with id ${id}`, StatusCodes.NOT_FOUND);
+                    // TODO: This error should be typed DBError
+                    throw new CustomError(`DB Error reading crawler id ${id}`, StatusCodes.INTERNAL_SERVER_ERROR);
                 }
+
+                if (!crawlerData) throw new CustomError(`There is no crawler with id ${id}`, StatusCodes.NOT_FOUND);
 
                 logger.success(`Result ${crawlerData.id} loaded successfully`);
 
@@ -87,13 +91,14 @@ module.exports = (options) => {
             }
         },
 
+        // TODO: Add query param filters (and pagination)
         async getList(request, response, next) {
             try {
                 logger.info('Getting results');
 
                 const crawlerDataList = await dbService.getList();
 
-                logger.success('Result list retrieved');
+                logger.success(`Retrieved list with ${crawlerDataList.length} documents`);
 
                 return response.status(StatusCodes.OK).json(crawlerDataList);
             } catch (error) {

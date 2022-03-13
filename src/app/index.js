@@ -5,6 +5,7 @@ const compression = require('compression');
 const express = require('express');
 const helmet = require('helmet');
 const requestContext = require('express-http-context');
+const swagger = require('swagger-ui-express');
 const cors = require('cors');
 const { StatusCodes } = require('http-status-codes');
 const mongoose = require('mongoose');
@@ -36,9 +37,8 @@ class Service {
         // Routers
         this._app.use(apiVersion, crawlerRouter());
 
-        // TODO
-        // const swaggerContent = require('../swagger')();
-        // this._app.use(`${apiVersion}/doc`, swagger.serve, swagger.setup(swaggerContent, { explorer: true }));
+        const swaggerContent = require('../swagger')();
+        this._app.use(`${apiVersion}/doc`, swagger.serve, swagger.setup(swaggerContent, { explorer: true }));
 
         // eslint-disable-next-line no-unused-vars
         const errorHandler = (err, req, res, next) => {

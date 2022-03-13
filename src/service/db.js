@@ -27,10 +27,16 @@ module.exports = (options) => {
         await Crawler.findByIdAndUpdate(id, { status: 'completed', duration: (new Date() - new Date(createdAt)) / 1000, urls });
     };
 
+    const updateStatus = async (id, status) => {
+        logger.info(`Updating ${id} status`);
+        await Crawler.findByIdAndUpdate(id, { status });
+    };
+
     return {
         createCrawlerEntry,
         getList,
         getOne,
         markAsCompleted,
+        updateStatus,
     };
 };

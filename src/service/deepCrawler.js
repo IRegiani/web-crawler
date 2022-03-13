@@ -16,7 +16,8 @@ module.exports = (options) => {
 
     const start = async (crawlerId, webhook, parserOptions) => {
         // TODO: This maxDepth should be reworked
-        const { maxDepth = 50, urls, createdAt, initialUrl } = await dbService.getOne(crawlerId);
+        const { maxDepth, urls, createdAt, initialUrl } = await dbService.getOne(crawlerId);
+        dbService.updateStatus(crawlerId, 'ongoing');
 
         const maxDepthIndex = maxDepth - 1;
         const visited = new Set(initialUrl);
@@ -59,7 +60,7 @@ module.exports = (options) => {
                 });
                 logger.success(`Webhook response: ${status}`, data);
             } catch (err) {
-                logger.error('Error on webhook response', err);
+                logger.error(`Error on webhook response: ${JSON.stringify(err.response.data)}`, err);
             }
         }
     };
