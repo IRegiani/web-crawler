@@ -4,7 +4,7 @@ const { CustomError } = require('../utils/error')();
 const logger = require('../utils/logger').initLogger({ name: 'DB SERVICE' });
 
 module.exports = (options) => {
-    const { Crawler } = options?.Crawler || require('../models')();
+    const { Crawler } = options?.models || require('../models')();
 
     const createCrawlerEntry = async (url, anchors, maxDepth) => {
         const crawler = new Crawler({ initialUrl: url, urls: [anchors], maxDepth });
@@ -16,9 +16,9 @@ module.exports = (options) => {
     const getList = async () => Crawler.find();
 
     const getOne = async (id) => {
-        const crawlerList = Crawler.findById(id).exec();
+        const crawlerList = await Crawler.findById(id).exec();
         // TODO: Type to database error
-        if (!crawlerList) throw new CustomError(`Id ${id} not found`, StatusCodes.BAD_REQUEST);
+        if (!crawlerList) throw new CustomError(`Id ${id} not found`, StatusCodes.NOT_FOUND);
         return crawlerList;
     };
 
@@ -29,7 +29,7 @@ module.exports = (options) => {
 
     const updateStatus = async (id, status) => {
         logger.info(`Updating ${id} status`);
-        await Crawler.findByIdAndUpdate(id, { status });
+        return Crawler.findByIdAndUpdate(id, { status });
     };
 
     return {

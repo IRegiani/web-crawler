@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 4040
 
-CMD ["npm", "run", "serve"]
+CMD ["npm", "run", "serve-big-memory"]

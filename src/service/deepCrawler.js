@@ -14,7 +14,7 @@ module.exports = (options) => {
         () => htmlParser.fetchHtml(u).then((res) => htmlParser.parseHtml(res, u, parserOptions)),
     )));
 
-    const start = async (crawlerId, webhook, parserOptions) => {
+    const run = async (crawlerId, webhook, parserOptions) => {
         // TODO: This maxDepth should be reworked
         const { maxDepth, urls, createdAt, initialUrl } = await dbService.getOne(crawlerId);
         dbService.updateStatus(crawlerId, 'ongoing');
@@ -66,6 +66,6 @@ module.exports = (options) => {
     };
 
     return {
-        start,
+        run,
     };
 };

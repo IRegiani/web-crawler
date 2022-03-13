@@ -16,12 +16,12 @@ const invalidAnchors = [
 const _removeSlash = (url) => (url.endsWith('/') ? url.substring(0, url.length - 1).trim() : url.trim());
 
 // Some anchor are relative links (/, ./, ../../), so we turn them into absolute links
-const normalizeUrlToAbsolute = (baseUrl, url) => {
+const _normalizeUrlToAbsolute = (baseUrl, url) => {
     if (invalidAnchors.some((inv) => url.startsWith(inv))) return null;
 
     try {
         const urlToCheck = (() => {
-            const isRelativeUrl = url.startsWith('/') || url.startsWith('.') || url.startsWith('.') || url.startsWith('..') || !url.startsWith('http');
+            const isRelativeUrl = url.startsWith('/') || url.startsWith('.') || url.startsWith('..') || !url.startsWith('http');
             if (!isRelativeUrl) return _removeSlash(url);
             return new URL(url, _removeSlash(baseUrl)).href;
         })();
@@ -37,7 +37,7 @@ const fetchHtml = async (url, ignoreError = true) => {
     logger.info(`Fetching ${url}`);
     try {
         const response = await axios(url);
-        return response.status === 200 ? response.data : null;
+        return response.data;
     } catch (error) {
         if (ignoreError) {
             logger.debug(`Error fetching ${url}: ${error?.response?.data}`, error);
@@ -47,14 +47,14 @@ const fetchHtml = async (url, ignoreError = true) => {
     }
 };
 
-const parseHtml = (html, baseUrl, options) => new Promise((resolve, reject) => {
+const parseHtml = (html, baseUrl, options = {}) => new Promise((resolve, reject) => {
     const { ignoreQueryParams, filterThirdPartyDomains } = options;
     const domHandler = new DomHandler((error, dom) => {
         if (error) reject(error);
 
         const anchors = DomUtils.getElementsByTagName('a', dom);
         logger.debug(`Found ${anchors.length} anchor elements`);
-        const anchorMapper = ({ attribs: { href } }) => (!href ? null : normalizeUrlToAbsolute(baseUrl, href));
+        const anchorMapper = ({ attribs: { href } }) => (!href ? null : _normalizeUrlToAbsolute(baseUrl, href));
 
         let filteredAnchors = [...new Set(anchors.map(anchorMapper))].filter((a) => !!a && !a.startsWith('#') && a !== '');
         logger.debug(`Removed ${anchors.length - filteredAnchors.length} repeated or invalid anchors`);
@@ -82,4 +82,6 @@ const parseHtml = (html, baseUrl, options) => new Promise((resolve, reject) => {
 module.exports = () => ({
     parseHtml,
     fetchHtml,
+
+    _normalizeUrlToAbsolute,
 });

@@ -9,8 +9,8 @@ module.exports = (options) => {
     const htmlParser = options?.htmlParser || require('../service/htmlParser')();
     const dbService = options?.dbService || require('../service/db')();
     const deepCrawler = options?.deepCrawler || require('../service/deepCrawler')();
-    const resolver = options?.resolver || new Resolver();
-    resolver.setServers(['1.1.1.1']);
+    const resolver = options?.resolver || new Resolver({ timeout: 10000 });
+    resolver.setServers(['1.1.1.1', '8.8.8.8']);
 
     const CrawlerController = {
 
@@ -37,7 +37,7 @@ module.exports = (options) => {
                     throw new CustomError('Invalid url', StatusCodes.BAD_REQUEST);
                 }
 
-                // TODo: Those errors should be type as ClientSideError
+                // TODO: Those errors should be typed as ClientSideError
                 if (webhook && !webhook.url) throw new CustomError('Missing url on webhook', StatusCodes.BAD_REQUEST);
                 if (webhook && !webhook.body) throw new CustomError('Missing body on webhook', StatusCodes.BAD_REQUEST);
                 if (typeof ignoreQueryParams !== 'boolean') throw new CustomError('ignoreQueryParams should be a boolean', StatusCodes.BAD_REQUEST);
@@ -55,7 +55,7 @@ module.exports = (options) => {
                 logger.success('First level crawler completed successfully');
 
                 const entry = await dbService.createCrawlerEntry(urlFixed, anchors, maxDepth);
-                deepCrawler.start(entry.id, webhook, { ignoreQueryParams, filterThirdPartyDomains });
+                deepCrawler.run(entry.id, webhook, { ignoreQueryParams, filterThirdPartyDomains });
 
                 return response.status(StatusCodes.CREATED).json({ id: entry.id, firstLevelUrls: anchors });
             } catch (error) {

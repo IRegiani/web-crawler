@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 const onFinished = require('on-finished');
 const requestContext = require('express-http-context');
 const logger = require('../utils/logger').initLogger({ name: 'REQUEST INTERCEPTOR' });

@@ -23,13 +23,12 @@ Alternatively, the Mongo DB can be run with only `docker run -d --name crawler-d
 
 #### Unit Tests
 
-Unit Tests can be run with `npm run test:unit`, reports will be available at `reports` folder
+Unit Tests can be run with `npm run test`, reports will be available at `reports` folder
 
 ### Pending Points
 
 - Improve webhook body
 - Add a denylist
-- Increase code coverage to 80%
 - Add option to custom headers
 - Add filters when fetching crawler lists
 - Refactor to TypeScript and ES

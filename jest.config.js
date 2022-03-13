@@ -1,5 +1,4 @@
 module.exports = {
-    // collectCoverage: true,
     verbose: true,
     clearMocks: true,
     resetMocks: true,
@@ -13,7 +12,7 @@ module.exports = {
             },
         ],
     ],
-    collectCoverageFrom: ['<rootDir>/src/**/*.js'],
+    collectCoverageFrom: ['<rootDir>/src/**/*.js', '!<rootDir>/src/swagger/**/*'],
     coverageDirectory: '<rootDir>/reports/jest',
     coverageThreshold: {
         global: {
@@ -23,6 +22,5 @@ module.exports = {
             statements: 80,
         },
     },
-    coverageReporters: ['text', 'text-summary', 'html', 'jest-junit', 'lcov'],
-    // moduleDirectories: ['<rootDir>/node_modules'],
+    coverageReporters: ['text', 'text-summary', 'html', 'lcov'],
 };
