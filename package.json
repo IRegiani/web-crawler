@@ -13,7 +13,7 @@
         "start": "node index.js",
         "local": "nodemon index.js",
         "serve": "NODE_ENV=production node index.js",
-        "serve-big-memory": "NODE_ENV=production node --max-old-space-size=4096 index.js"
+        "serve-big-memory": "NODE_ENV=production node --max-old-space-size=6144 index.js"
     },
     "repository": {
         "type": "git",
