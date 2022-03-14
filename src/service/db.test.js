@@ -55,10 +55,10 @@ describe('DB', () => {
     });
 
     test('markAsCompleted', async () => {
-        await db.markAsCompleted(dummyId, '2022-03-12T23:44:30.807Z', []);
+        await db.markAsCompleted(dummyId, '2022-03-12T23:44:30.807Z');
 
         expect(mockedImports.models.Crawler.findByIdAndUpdate).toHaveBeenCalledTimes(1);
-        expect(mockedImports.models.Crawler.findByIdAndUpdate).toHaveBeenCalledWith(dummyId, { status: 'completed', urls: [], duration: expect.any(Number) });
+        expect(mockedImports.models.Crawler.findByIdAndUpdate).toHaveBeenCalledWith(dummyId, { status: 'completed', duration: expect.any(Number) });
     });
 
     test('updateStatus', async () => {
@@ -66,6 +66,15 @@ describe('DB', () => {
 
         expect(mockedImports.models.Crawler.findByIdAndUpdate).toHaveBeenCalledTimes(1);
         expect(mockedImports.models.Crawler.findByIdAndUpdate).toHaveBeenCalledWith(dummyId, { status: 'status' });
-        expect(result).toEqual({});
+        expect(result).toEqual(dummyResult);
+    });
+
+    test('updateLevelData', async () => {
+        const dummyUrls = [];
+        const result = await db.updateLevelData(dummyId, dummyUrls, 'status');
+
+        expect(mockedImports.models.Crawler.findByIdAndUpdate).toHaveBeenCalledTimes(1);
+        expect(mockedImports.models.Crawler.findByIdAndUpdate).toHaveBeenCalledWith(dummyId, { status: 'status', $push: { urls: dummyUrls } });
+        expect(result).toEqual(dummyResult);
     });
 });

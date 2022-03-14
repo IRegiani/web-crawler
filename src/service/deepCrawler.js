@@ -17,34 +17,41 @@ module.exports = (options) => {
     const run = async (crawlerId, webhook, parserOptions) => {
         // TODO: This maxDepth should be reworked
         const { maxDepth, urls, createdAt, initialUrl } = await dbService.getOne(crawlerId);
-        dbService.updateStatus(crawlerId, 'ongoing');
+        dbService.updateStatus(crawlerId, 'ongoing-2');
 
-        const maxDepthIndex = maxDepth - 1;
-        const visited = new Set(initialUrl);
+        // const maxDepthIndex = maxDepth - 1;
+        // TODO: Removing this would save memory
+        const visitedUrls = new Set();
+        // const visitedUrls = new Set([initialUrl, ...urls[0]]);
+        visitedUrls.add(initialUrl);
+        let currentUrlList = urls[0];
 
-        let currentDepth = 0;
-        while (currentDepth < maxDepthIndex) {
-            logger.info(`\t>>>>>>>>>>>>>>>>>>>> \t Starting crawler at level ${currentDepth + 2}. Has ${urls[currentDepth].length} items\n`);
+        let currentDepth = 1;
+        while (currentDepth < maxDepth) {
+            logger.info(`\t>>>>>>>>>>>>>>>>>>>> \t Starting crawler at level ${currentDepth + 1}. Has ${currentUrlList.length} items\n`);
 
-            const onlyNotVisitedUrls = urls[currentDepth].filter((url) => !visited.has(url));
-            logger.debug(`Already visited ${urls[currentDepth].length - onlyNotVisitedUrls.length} urls, skipping`);
+            const onlyNotVisitedUrls = currentUrlList.filter((url) => !visitedUrls.has(url));
+            logger.debug(`Already visited ${currentUrlList.length - onlyNotVisitedUrls.length} urls, skipping`);
             // eslint-disable-next-line no-await-in-loop
             const newUrls = await crawUrls(onlyNotVisitedUrls, parserOptions);
 
             // TODO: Ideally the urls traversal should be kept, possible option: { 0: [], 0-1: []}
             // The levelList should contain only new and unvisited urls
-            const levelList = [...new Set(newUrls.flat())].filter((url) => !visited.has(url));
-            visited.add(...levelList);
-            if (levelList.length !== 0) urls.push(levelList);
-
-            currentDepth += 1;
-            if (urls[currentDepth] === undefined || urls[currentDepth].length === 0) {
-                logger.warn(`No more URLs were found. Exiting at depth ${currentDepth + 1}`);
+            const levelList = [...new Set(newUrls.flat())].filter((url) => !visitedUrls.has(url));
+            onlyNotVisitedUrls.forEach(visitedUrls.add, visitedUrls);
+            if (levelList.length !== 0) {
+                // eslint-disable-next-line no-await-in-loop
+                await dbService.updateLevelData(crawlerId, levelList, `ongoing-${currentDepth + 1}`);
+                currentUrlList = levelList;
+            } else {
+                logger.warn(`No more new URLs were found. Exiting at depth ${currentDepth + 1}`);
                 break;
             }
+
+            currentDepth += 1;
         }
 
-        await dbService.markAsCompleted(crawlerId, createdAt, urls);
+        await dbService.markAsCompleted(crawlerId, createdAt);
 
         logger.success('Crawler finished\n');
 

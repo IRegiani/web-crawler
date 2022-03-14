@@ -12,7 +12,7 @@ const invalidAnchors = [
     'tel',
 ];
 
-// Check why this is needed
+// WIP: Check why this is not working
 const _removeSlash = (url) => (url.endsWith('/') ? url.substring(0, url.length - 1).trim() : url.trim());
 
 // Some anchor are relative links (/, ./, ../../), so we turn them into absolute links
@@ -40,7 +40,7 @@ const fetchHtml = async (url, ignoreError = true) => {
         return response.data;
     } catch (error) {
         if (ignoreError) {
-            logger.debug(`Error fetching ${url}: ${error?.response?.data}`, error);
+            logger.debug(`Error fetching ${url}: ${error?.response?.status}`, error);
             return null;
         }
         throw error;
@@ -68,7 +68,7 @@ const parseHtml = (html, baseUrl, options = {}) => new Promise((resolve, reject)
         if (filterThirdPartyDomains) {
             const beforeFilterLength = filteredAnchors.length;
             const { hostname } = new URL(baseUrl);
-            filteredAnchors = filteredAnchors.filter((a) => a.includes(hostname));
+            filteredAnchors = filteredAnchors.filter((a) => a.includes(`https://${hostname}`) || a.includes(`http://${hostname}`));
             logger.debug(`Removed ${beforeFilterLength - filteredAnchors.length} anchors outside ${baseUrl}`);
         }
 

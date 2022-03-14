@@ -29,10 +29,12 @@ Unit Tests can be run with `npm run test`, reports will be available at `reports
 
 - Improve webhook body
 - Add a denylist
+- Improve domain and subdomain filter
+- Handle 302 and 307 codes
 - Add option to custom headers
 - Add filters when fetching crawler lists
-- Refactor to TypeScript and ES
+- Refactor to TypeScript and ES2022
 
 ## Note
 
-Using a big maxDepth will consume lots of memory (>2GB). This will crash node js, run it as `npm run serve-big-memory`
+Using a big maxDepth will consume lots of memory (>2GB). This will crash node js, run it as `npm run serve-big-memory`. This still needs improvement

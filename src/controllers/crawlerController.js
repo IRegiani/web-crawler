@@ -47,6 +47,7 @@ module.exports = (options) => {
                 // TODO: Implement waitInterval
                 // TODO: Continue on URL fetch/parse failure/timeout, save on DB
 
+                // WIP: Use this date as initial reference to calculate duration
                 const html = await htmlParser.fetchHtml(urlFixed, false)
                     .catch((err) => { throw new CustomError(`Failed to fetch ${urlFixed}. ${err}`); });
                 const parserOptions = { ignoreQueryParams, filterThirdPartyDomains };

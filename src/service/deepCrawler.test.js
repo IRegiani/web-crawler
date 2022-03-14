@@ -15,6 +15,7 @@ describe('DeepCrawler', () => {
             getOne: jest.fn(),
             updateStatus: jest.fn(),
             markAsCompleted: jest.fn(),
+            updateLevelData: jest.fn(),
         },
     };
 
@@ -34,17 +35,19 @@ describe('DeepCrawler', () => {
     });
 
     // TODO: Improve tests
-    test('run crawler', async () => {
+    test('run crawler - single level', async () => {
         const parserOptions = {};
 
         await deepCrawler.run(mockedId, null, parserOptions);
 
         expect(mockedImports.dbService.getOne).toHaveBeenCalledWith(mockedId);
-        expect(mockedImports.dbService.updateStatus).toHaveBeenCalledWith(mockedId, 'ongoing');
-        expect(mockedImports.dbService.markAsCompleted).toHaveBeenCalledWith(mockedId, crawlerDBEntry.createdAt, crawlerDBEntry.urls);
+        expect(mockedImports.dbService.updateStatus).toHaveBeenCalledWith(mockedId, 'ongoing-2');
+        expect(mockedImports.dbService.markAsCompleted).toHaveBeenCalledWith(mockedId, crawlerDBEntry.createdAt);
         expect(axios).not.toHaveBeenCalled();
+        expect(mockedImports.dbService.updateLevelData).not.toHaveBeenCalled();
     });
 
+    test.todo('run crawler - multiple levels');
     test.todo('run crawler - skips already visited urls');
     test.todo('run crawler - calls webhook');
     test.todo('run crawler - calls webhook, returns error');

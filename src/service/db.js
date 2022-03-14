@@ -22,14 +22,19 @@ module.exports = (options) => {
         return crawlerList;
     };
 
-    const markAsCompleted = async (id, createdAt, urls) => {
+    const markAsCompleted = async (id, createdAt) => {
         logger.info(`Marking ${id} as complete`);
-        await Crawler.findByIdAndUpdate(id, { status: 'completed', duration: (new Date() - new Date(createdAt)) / 1000, urls });
+        await Crawler.findByIdAndUpdate(id, { status: 'completed', duration: (new Date() - new Date(createdAt)) / 1000 });
     };
 
     const updateStatus = async (id, status) => {
         logger.info(`Updating ${id} status`);
         return Crawler.findByIdAndUpdate(id, { status });
+    };
+
+    const updateLevelData = async (id, urls, status) => {
+        logger.info(`Updating ${id} level data`);
+        return Crawler.findByIdAndUpdate(id, { status, $push: { urls } });
     };
 
     return {
@@ -38,5 +43,6 @@ module.exports = (options) => {
         getOne,
         markAsCompleted,
         updateStatus,
+        updateLevelData,
     };
 };

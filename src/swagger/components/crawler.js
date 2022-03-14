@@ -39,8 +39,8 @@ module.exports = () => ({
             status: {
                 type: 'string',
                 example: 'pending',
-                enum: ['pending', 'ongoing', 'completed'],
-                description: 'Marks if the crawling operation has completed',
+                enum: ['pending', 'ongoing-n', 'completed'],
+                description: 'Marks if the crawling operation has completed or if is being processed at depth n',
             },
             urls: {
                 type: 'array',

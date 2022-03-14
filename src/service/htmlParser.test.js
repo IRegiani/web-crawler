@@ -11,7 +11,7 @@ describe('HtmlParser', () => {
         <a href="https://www.google.com">abc</a>
         <a href="https://www.google.com.br/imghp?hl=pt-BR&tab=wi">def</a>
         <a href="https://www.google.com.br/imghp?hl=US&tab=wi">def</a>
-        <a href="https://www.mail.google.com.br/imghp?hl=pt-BR&tab=wi">def</a>
+        <a href="https://www.mail.google.com/imghp?hl=pt-BR&tab=wi">def</a>
         <a>def</a>
       </body>
     </html>
@@ -66,7 +66,7 @@ describe('HtmlParser', () => {
         expect(anchors[0]).toBe(baseUrl);
         expect(anchors[1]).toBe('https://www.google.com.br/imghp?hl=pt-BR&tab=wi');
         expect(anchors[2]).toBe('https://www.google.com.br/imghp?hl=US&tab=wi');
-        expect(anchors[3]).toBe('https://www.mail.google.com.br/imghp?hl=pt-BR&tab=wi');
+        expect(anchors[3]).toBe('https://www.mail.google.com/imghp?hl=pt-BR&tab=wi');
     });
 
     test('parseHtml - ignoreQueryParams and filterThirdPartyDomains', async () => {
