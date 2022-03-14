@@ -1,7 +1,7 @@
 version: '3'
 services:
   service:
-    cpuset: 0,1
+    # cpuset: 0,1
     build: .
     ports:
       - "4040:4040"

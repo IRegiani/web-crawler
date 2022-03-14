@@ -19,7 +19,7 @@ module.exports = (options) => {
                 body: {
                     url,
                     webhook,
-                    maxDepth = 10,
+                    maxDepth = 5,
                     ignoreQueryParams = true,
                     filterThirdPartyDomains = true,
                 } } = request;

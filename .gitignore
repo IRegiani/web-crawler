@@ -1,3 +1,5 @@
 /node_modules
 /reports
 local.json
+certificate.pem
+key.pem

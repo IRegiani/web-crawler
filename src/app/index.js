@@ -9,11 +9,15 @@ const swagger = require('swagger-ui-express');
 const cors = require('cors');
 const { StatusCodes } = require('http-status-codes');
 const mongoose = require('mongoose');
+const https = require('https');
+const fs = require('fs');
 
 const RequestInterceptor = require('../interceptors/request');
 
 // Router
 const crawlerRouter = require('../routers/crawlerRouter');
+
+const swaggerContent = require('../swagger')();
 
 class Service {
     constructor(logger) {
@@ -35,9 +39,9 @@ class Service {
         this._app.use(RequestInterceptor());
 
         // Routers
+        this._app.get(`${apiVersion}/`, (req, res) => res.json({ initDate: this.initDate }));
         this._app.use(apiVersion, crawlerRouter());
 
-        const swaggerContent = require('../swagger')();
         this._app.use(`${apiVersion}/doc`, swagger.serve, swagger.setup(swaggerContent, { explorer: true }));
 
         // eslint-disable-next-line no-unused-vars
@@ -52,7 +56,15 @@ class Service {
     }
 
     async listen(...params) {
-        this._app.listen(...params);
+        if (config.get('server.ssl')) {
+            const options = {
+                key: fs.readFileSync('key.pem'),
+                cert: fs.readFileSync('certificate.pem'),
+            };
+            https.createServer(options, this._app).listen(...params);
+        } else {
+            this._app.listen(...params);
+        }
     }
 
     async startDB() {

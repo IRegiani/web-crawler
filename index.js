@@ -20,7 +20,7 @@ const initService = async () => {
 
         service.listen(port, (error) => {
             if (error) throw error;
-            logger.success(`Service started 🚀 See Swagger at: http://localhost:${port}${version}/doc \n`);
+            logger.success(`Service started 🚀 See Swagger at: ${config.get('server.ssl') ? 'https' : 'http'}://localhost:${port}${version}/doc \n`);
         });
     } catch (error) {
         logger.error(`Error initializing Service: ${error.message}`, error);
