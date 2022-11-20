@@ -18,10 +18,9 @@ module.exports = () => ({
         tags: ['Crawler'],
         summary: 'Creates a crawler',
         description: 'Initiate the crawler on a URL, returning the all URLs found at first level. Further levels are fetched asynchronously',
-        operationId: 'updateJournal',
+        operationId: 'createCrawler',
         requestBody: {
             required: true,
-            description: 'Updates tags in the journal',
             content: {
                 'application/json': {
                     schema: {

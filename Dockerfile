@@ -2,7 +2,7 @@ FROM node:lts-alpine3.14
 
 WORKDIR /usr/src/app
 
-RUN apk update && apk upgrade
+RUN apk update && apk upgrade && rm -rf /var/lib/apt/lists/*
 
 RUN apk add --no-cache tzdata
 
@@ -10,7 +10,7 @@ ENV TZ America/Sao_Paulo
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci --production
 
 COPY . .
 
